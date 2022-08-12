@@ -1,8 +1,23 @@
 type Move = "rock" | "paper" | "scissors";
 const MOVE_LIST: Move[] = ["rock", "paper", "scissors"];
 
-/* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values_inclusive */
+/* Global element references */
+const rockBtn = <HTMLButtonElement>document.getElementById("rock-button")!;
+const paperBtn = <HTMLButtonElement>document.getElementById("paper-button")!;
+const scissorsBtn = <HTMLButtonElement>(
+  document.getElementById("scissors-button")!
+);
+const computerMoveLbl = document.getElementById("computer-move")!;
+const roundResultLbl = document.getElementById("round-result")!;
+
+[rockBtn, paperBtn, scissorsBtn].forEach((btn) =>
+  btn.addEventListener("click", moveBtnClickEventListener, { once: true })
+);
+
+/* Functions */
+
 function getRandomIntInclusive(min: number, max: number) {
+  /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values_inclusive */
   min = Math.ceil(min);
   max = Math.floor(max);
   //The maximum is inclusive and the minimum is inclusive
@@ -82,10 +97,24 @@ function game() {
   else alert("It's a tie!");
 }
 
-function main() {
-  game();
-}
+function moveBtnClickEventListener(e: Event) {
+  const button = <HTMLButtonElement>e.target;
 
-main();
+  // disable other buttons i.e. except the one pressed
+  [rockBtn, paperBtn, scissorsBtn].forEach((btn) => {
+    if (btn != button) btn.disabled = true;
+  });
+
+  // change button color
+  button.style.backgroundColor = "hsl(189deg 100% 75%)";
+
+  // make labels visible
+  computerMoveLbl.classList.remove("visibility-hidden");
+  roundResultLbl.classList.remove("visibility-hidden");
+  computerMoveLbl.style.opacity = "100";
+  setTimeout(() => {
+    roundResultLbl.style.opacity = "100";
+  }, 0.5 * 1000);
+}
 
 export {};
