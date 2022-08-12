@@ -1,5 +1,5 @@
-type Weapon = "rock" | "paper" | "scissors";
-const WEAPON_LIST: Weapon[] = ["rock", "paper", "scissors"];
+type Move = "rock" | "paper" | "scissors";
+const MOVE_LIST: Move[] = ["rock", "paper", "scissors"];
 
 /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values_inclusive */
 function getRandomIntInclusive(min: number, max: number) {
@@ -9,8 +9,8 @@ function getRandomIntInclusive(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function getComputerChoice(): Weapon {
-  return WEAPON_LIST[getRandomIntInclusive(0, WEAPON_LIST.length - 1)];
+function getComputerChoice(): Move {
+  return MOVE_LIST[getRandomIntInclusive(0, MOVE_LIST.length - 1)];
 }
 
 function capitalize(word: string): string {
@@ -19,8 +19,8 @@ function capitalize(word: string): string {
 }
 
 function playRound(
-  playerSelection: Weapon,
-  computerSelection: Weapon
+  playerSelection: Move,
+  computerSelection: Move
 ): "player" | "computer" | "tie" {
   if (playerSelection === computerSelection) return "tie";
 
@@ -34,7 +34,7 @@ function playRound(
   return "computer";
 }
 
-function getPlayerSelection(): Weapon {
+function getPlayerSelection(): Move {
   let ans: any;
 
   // ask for input until the input is valid
@@ -42,7 +42,7 @@ function getPlayerSelection(): Weapon {
     ans = prompt("Play your move: Rock, Paper, Scissors");
     // if ans is undefined/null/empty string
     if (!ans) continue;
-    if (WEAPON_LIST.includes(ans.toLowerCase())) break;
+    if (MOVE_LIST.includes(ans.toLowerCase())) break;
   }
 
   return ans.toLowerCase();
@@ -52,8 +52,8 @@ function game() {
   let playerWinCount = 0;
   let computerWinCount = 0;
   for (let i = 0; i < 5; i++) {
-    const playerSelection: Weapon = getPlayerSelection();
-    const computerSelection: Weapon = getComputerChoice();
+    const playerSelection: Move = getPlayerSelection();
+    const computerSelection: Move = getComputerChoice();
     switch (playRound(playerSelection, computerSelection)) {
       case "player":
         playerWinCount++;
