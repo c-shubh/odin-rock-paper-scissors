@@ -7,41 +7,43 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
+}
+
+.game {
+  max-width: calc(100% - 2em);
+  margin: 0 auto;
 }
 
 .game-title {
-  font-size: 3em;
   display: block;
-  margin-bottom: 1em;
+  margin: 0.5em;
+  font-size: 1.5em;
+  text-align: center;
+  font-weight: bold;
 }
 
-.round {
+.round,
+.score {
+  padding: 0.5em;
+  margin-bottom: 0.5em;
   display: flex;
   flex-direction: column;
-  border: 2px solid black;
-  border-radius: 5px;
-  padding: 1em;
 }
 
-.round-title {
-  margin: 0 auto 1em auto;
-  font-size: 1.5em;
+#round-title,
+#score-title {
+  margin: 0 auto;
+  margin-bottom: 0.5em;
+  font-weight: bold;
 }
 
 .move-buttons {
   display: flex;
-  justify-content: space-between;
-  gap: 1em;
+  flex-direction: column;
   margin-bottom: 0.5em;
 }
 
 .move-buttons button {
-  padding: 0.5em;
-  width: 100%;
   transition: background-color 0.2s ease-in;
 }
 
@@ -54,11 +56,63 @@ body {
 #round-result {
   opacity: 0;
   transition: opacity 0.2s ease-in;
-  transition-timing-function: ease-in;
+}
+
+.scores-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Utility classes */
 
 .visibility-hidden {
   visibility: hidden;
+}
+
+/* Mobile M */
+@media screen and (min-width: 375px) {
+  .move-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Mobile L */
+@media screen and (min-width: 425px) {
+  .game {
+    max-width: 389px;
+  }
+  .move-buttons {
+    gap: 0.5em;
+  }
+
+  .move-buttons button {
+    width: 100%;
+  }
+
+  .scores-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 768px) {
+  .game {
+    max-width: 480px;
+  }
+}
+
+/* Laptop */
+@media screen and (min-width: 1024px) {
+  .game {
+    max-width: 556px;
+  }
+}
+
+/* Laptop L */
+@media screen and (min-width: 1440px) {
+  .game {
+    max-width: 612px;
+  }
 }

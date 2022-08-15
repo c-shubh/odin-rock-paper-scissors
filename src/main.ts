@@ -1,7 +1,11 @@
+import party from "party-js";
+
 type Move = "rock" | "paper" | "scissors";
 const MOVE_LIST: Move[] = ["rock", "paper", "scissors"];
 
 /* Global element references */
+const roundTitleLbl = document.getElementById("round-title")!;
+const scoreTitleLbl = document.getElementById("score-title")!;
 const rockBtn = <HTMLButtonElement>document.getElementById("rock-button")!;
 const paperBtn = <HTMLButtonElement>document.getElementById("paper-button")!;
 const scissorsBtn = <HTMLButtonElement>(
@@ -9,10 +13,22 @@ const scissorsBtn = <HTMLButtonElement>(
 );
 const computerMoveLbl = document.getElementById("computer-move")!;
 const roundResultLbl = document.getElementById("round-result")!;
+const playerScoreLbl = document.getElementById("player-score")!;
+const computerScoreLbl = document.getElementById("computer-score")!;
 
-[rockBtn, paperBtn, scissorsBtn].forEach((btn) =>
-  btn.addEventListener("click", moveBtnClickEventListener, { once: true })
-);
+const Game = {
+  playerScore: 0,
+  computerScore: 0,
+  round: 1,
+  maxRounds: 5,
+};
+
+// add player move event listeners
+[rockBtn, paperBtn, scissorsBtn].forEach((btn) => {
+  btn.addEventListener("click", playRound, { once: true });
+});
+deHighlightPlayerMove();
+setRoundLabel();
 
 /* Functions */
 
@@ -24,7 +40,7 @@ function getRandomIntInclusive(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function getComputerChoice(): Move {
+function getComputerMove(): Move {
   return MOVE_LIST[getRandomIntInclusive(0, MOVE_LIST.length - 1)];
 }
 
@@ -33,7 +49,7 @@ function capitalize(word: string): string {
   return word[0].toUpperCase() + word.slice(1, word.length);
 }
 
-function playRound(
+function decideRoundWinner(
   playerSelection: Move,
   computerSelection: Move
 ): "player" | "computer" | "tie" {
@@ -49,57 +65,102 @@ function playRound(
   return "computer";
 }
 
-function getPlayerSelection(): Move {
-  let ans: any;
-
-  // ask for input until the input is valid
-  while (true) {
-    ans = prompt("Play your move: Rock, Paper, Scissors");
-    // if ans is undefined/null/empty string
-    if (!ans) continue;
-    if (MOVE_LIST.includes(ans.toLowerCase())) break;
-  }
-
-  return ans.toLowerCase();
+function decideGameWinner(): "player" | "computer" | "tie" {
+  if (Game.playerScore > Game.computerScore) return "player";
+  else if (Game.computerScore > Game.playerScore) return "computer";
+  else return "tie";
 }
 
-function game() {
-  let playerWinCount = 0;
-  let computerWinCount = 0;
-  for (let i = 0; i < 5; i++) {
-    const playerSelection: Move = getPlayerSelection();
-    const computerSelection: Move = getComputerChoice();
-    switch (playRound(playerSelection, computerSelection)) {
-      case "player":
-        playerWinCount++;
-        alert(
-          `${capitalize(playerSelection)} beats ${capitalize(
-            computerSelection
-          )}. You scored a point!`
-        );
-        break;
-      case "computer":
-        computerWinCount++;
-        alert(
-          `${capitalize(computerSelection)} beats ${capitalize(
-            playerSelection
-          )}. Computer scored a point!`
-        );
-        break;
-      case "tie":
-        alert("It was a tie.");
-        break;
-    }
+function getPlayerMove(e: Event): Move | undefined {
+  switch (e.target) {
+    case rockBtn:
+      return "rock";
+    case paperBtn:
+      return "paper";
+    case scissorsBtn:
+      return "scissors";
   }
-  if (playerWinCount > computerWinCount) alert("Yay! You won!");
-  else if (computerWinCount > playerWinCount)
-    alert("You lost, computer won :(");
-  else alert("It's a tie!");
+  return;
 }
 
-function moveBtnClickEventListener(e: Event) {
+function playRound(e: Event) {
+  setRoundLabel();
+  highlightPlayerMove(e);
+  const playerMove: Move = getPlayerMove(e)!;
+  const computerMove: Move = getComputerMove();
+  const winner = decideRoundWinner(playerMove, computerMove);
+  setLabel(computerMoveLbl, `Computer chose ${capitalize(computerMove)}`);
+  switch (winner) {
+    case "player":
+      Game.playerScore++;
+      setLabel(roundResultLbl, "You won this round!");
+      break;
+    case "computer":
+      Game.computerScore++;
+      setLabel(roundResultLbl, "Computer won this round!");
+      break;
+    case "tie":
+      setLabel(roundResultLbl, "It's a tie!");
+      break;
+  }
+  console.log(Game.round);
+
+  const currRound = Game.round;
+  setTimeout(() => {
+    showLabels();
+    setTimeout(() => {
+      setScoreLabel();
+      if (currRound === Game.maxRounds) {
+        switch (decideGameWinner()) {
+          case "player":
+            setLabel(scoreTitleLbl, "You Won!");
+            party.confetti(scoreTitleLbl, {
+              count: 40,
+              spread: 32,
+              size: 1,
+            });
+            break;
+          case "computer":
+            setLabel(scoreTitleLbl, "Computer Won!");
+            break;
+          case "tie":
+            setLabel(scoreTitleLbl, "It's a tie");
+            break;
+        }
+      }
+    }, 0.8 * 1000);
+  }, 0.5 * 1000);
+
+  if (currRound !== Game.maxRounds) {
+    Game.round++;
+
+    setTimeout(() => {
+      resetRound();
+    }, 3 * 1000);
+  }
+}
+
+function resetRound() {
+  // add player move event listeners
+  [rockBtn, paperBtn, scissorsBtn].forEach((btn) => {
+    btn.addEventListener("click", playRound, { once: true });
+  });
+  deHighlightPlayerMove();
+  setRoundLabel();
+  hideLabels();
+}
+
+function setRoundLabel() {
+  setLabel(roundTitleLbl, `Round ${Game.round}`);
+}
+
+function setScoreLabel() {
+  setLabel(playerScoreLbl, `Player: ${Game.playerScore}`);
+  setLabel(computerScoreLbl, `Computer: ${Game.computerScore}`);
+}
+
+function highlightPlayerMove(e: Event) {
   const button = <HTMLButtonElement>e.target;
-
   // disable other buttons i.e. except the one pressed
   [rockBtn, paperBtn, scissorsBtn].forEach((btn) => {
     if (btn != button) btn.disabled = true;
@@ -107,14 +168,39 @@ function moveBtnClickEventListener(e: Event) {
 
   // change button color
   button.style.backgroundColor = "hsl(189deg 100% 75%)";
+}
 
+function showLabels() {
   // make labels visible
-  computerMoveLbl.classList.remove("visibility-hidden");
-  roundResultLbl.classList.remove("visibility-hidden");
+  [computerMoveLbl, roundResultLbl].forEach((label) =>
+    label.classList.remove("visibility-hidden")
+  );
+
+  // fade in labels
   computerMoveLbl.style.opacity = "100";
   setTimeout(() => {
     roundResultLbl.style.opacity = "100";
   }, 0.5 * 1000);
+}
+
+function hideLabels() {
+  [computerMoveLbl, roundResultLbl].forEach((label) => {
+    label.classList.add("visibility-hidden");
+    label.style.opacity = "0";
+  });
+}
+
+function setLabel(label: HTMLSpanElement, textContent: string) {
+  label.textContent = textContent;
+}
+
+function deHighlightPlayerMove() {
+  [rockBtn, paperBtn, scissorsBtn].forEach((btn) => {
+    // enable all buttons
+    btn.disabled = false;
+    // revert button color to initial
+    btn.style.backgroundColor = "initial";
+  });
 }
 
 export {};
