@@ -63,6 +63,13 @@ body {
   flex-direction: column;
 }
 
+.copyright {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  align-items: center;
+}
+
 /* Utility classes */
 
 .visibility-hidden {
